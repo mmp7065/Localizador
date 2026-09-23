@@ -5,13 +5,109 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Localizador</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#000;color:#39ff88;font-family:Arial,sans-serif;overflow:hidden}
-body{display:flex;align-items:center;justify-content:center}.screen{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
-h1{font-size:30px;letter-spacing:5px;margin:0 0 35px}button{background:#000;color:#39ff88;border:2px solid #39ff88;border-radius:10px;padding:16px 28px;font-size:18px;font-weight:bold;letter-spacing:1px}
-.status{margin-top:22px;max-width:92%;font-size:15px;line-height:1.5;white-space:pre-wrap}.error{color:#ff6666}.hidden{display:none!important}
-.arrowWrap{width:220px;height:220px;display:flex;align-items:center;justify-content:center;margin:10px 0 25px}
-.arrow{width:0;height:0;border-left:42px solid transparent;border-right:42px solid transparent;border-bottom:150px solid #39ff88;filter:drop-shadow(0 0 8px #39ff88);transform-origin:50% 58%}
-.info{font-size:18px;line-height:1.8}.small{font-size:12px;opacity:.65;margin-top:15px}
+*{box-sizing:border-box}
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    background:#000;
+    color:#39ff88;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow:hidden;
+}
+body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.screen{
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:20px;
+}
+h1{
+    font-size:34px;
+    font-weight:700;
+    letter-spacing:7px;
+    margin:0 0 42px;
+    text-shadow:0 0 10px rgba(57,255,136,.35);
+}
+button{
+    background:#000;
+    color:#39ff88;
+    border:2px solid #39ff88;
+    border-radius:8px;
+    padding:17px 34px;
+    font-size:18px;
+    font-weight:bold;
+    letter-spacing:2px;
+    box-shadow:0 0 12px rgba(57,255,136,.18);
+    cursor:pointer;
+    transition:.15s;
+}
+button:active{
+    transform:scale(.97);
+    box-shadow:0 0 20px rgba(57,255,136,.35);
+}
+button:disabled{
+    opacity:.55;
+}
+.status{
+    margin-top:24px;
+    max-width:90%;
+    font-size:15px;
+    line-height:1.5;
+    white-space:pre-wrap;
+}
+.error{
+    color:#ff5555;
+}
+.hidden{
+    display:none!important;
+}
+.info{
+    font-size:18px;
+    line-height:1.9;
+    letter-spacing:.4px;
+}
+.small{
+    font-size:12px;
+    opacity:.55;
+    margin-top:18px;
+}
+.arrowWrap{
+    width:270px;
+    height:270px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 0 20px;
+}
+.arrow{
+    width:0;
+    height:0;
+    border-left:48px solid transparent;
+    border-right:48px solid transparent;
+    border-bottom:175px solid #39ff88;
+    filter:
+        drop-shadow(0 0 5px #39ff88)
+        drop-shadow(0 0 14px rgba(57,255,136,.45));
+    transform-origin:50% 58%;
+    animation:tremble .11s infinite alternate ease-in-out;
+}
+@keyframes tremble{
+    0%{margin-left:-2px;margin-top:1px}
+    50%{margin-left:2px;margin-top:-1px}
+    100%{margin-left:-1px;margin-top:2px}
+}
+#distance,#direction{
+    text-shadow:0 0 7px rgba(57,255,136,.18);
+}
 </style>
 </head>
 <body>
