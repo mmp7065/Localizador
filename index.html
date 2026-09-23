@@ -339,40 +339,34 @@ async function compass(){
 function onOrientation(e){
   let h=null;
 
-  // iOS gives a compass heading directly; this is preferable to alpha.
+  // iPhone/iPad: este valor já é a bússola do aparelho.
   if(typeof e.webkitCompassHeading==="number"&&Number.isFinite(e.webkitCompassHeading)){
-    // Inversão completa da leitura original.
-    h=-e.webkitCompassHeading;
+    h=e.webkitCompassHeading;
   }else if(typeof e.alpha==="number"&&Number.isFinite(e.alpha)){
-    // Inversão completa da leitura original.
-    h=-e.alpha;
+    // Android/Chrome: converte alpha para rumo e corrige a rotação da tela.
+    h=360-e.alpha;
+
+    const screenAngle =
+      (screen.orientation && typeof screen.orientation.angle==="number")
+        ? screen.orientation.angle
+        : (typeof window.orientation==="number" ? window.orientation : 0);
+
+    h+=screenAngle;
   }
 
   if(h===null)return;
 
-  h=norm(h);
+  h=((h%360)+360)%360;
 
-  // Ignore extreme sensor jumps. A phone cannot physically rotate hundreds
-  // of degrees between two sensor frames.
-  if(lastRawHeading!==null){
-    const jump=Math.abs(angleDiff(h,lastRawHeading));
-    if(jump>75)return;
-  }
-  lastRawHeading=h;
-
-  if(smoothedHeading===null){
-    smoothedHeading=h;
-  }else{
-    smoothedHeading=circularAverage(smoothedHeading,h,0.12);
+  // Suavização circular para evitar saltos causados pelo sensor.
+  if(lastHeading!==null){
+    let d=((h-lastHeading+540)%360)-180;
+    if(Math.abs(d)>100)return;
+    h=lastHeading+d*0.12;
   }
 
-  heading=smoothedHeading;
-  updateArrow();
-
-  if(targetBearing!==null){
-    const rel=norm(targetBearing-heading);
-    direction.textContent="Direção relativa: "+Math.round(rel)+"°";
-  }
+  lastHeading=h;
+  heading=h;
 }
 
 function calculate(lat,lon){
