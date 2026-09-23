@@ -341,10 +341,11 @@ function onOrientation(e){
 
   // iOS gives a compass heading directly; this is preferable to alpha.
   if(typeof e.webkitCompassHeading==="number"&&Number.isFinite(e.webkitCompassHeading)){
-    h=360-e.webkitCompassHeading;
+    // Inversão completa da leitura original.
+    h=-e.webkitCompassHeading;
   }else if(typeof e.alpha==="number"&&Number.isFinite(e.alpha)){
-    // Inverted compass reading.
-    h=e.alpha;
+    // Inversão completa da leitura original.
+    h=-e.alpha;
   }
 
   if(h===null)return;
