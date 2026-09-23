@@ -341,11 +341,10 @@ function onOrientation(e){
 
   // iOS gives a compass heading directly; this is preferable to alpha.
   if(typeof e.webkitCompassHeading==="number"&&Number.isFinite(e.webkitCompassHeading)){
-    h=e.webkitCompassHeading;
+    h=360-e.webkitCompassHeading;
   }else if(typeof e.alpha==="number"&&Number.isFinite(e.alpha)){
-    // For absolute orientation, alpha is the rotation around the Z axis.
-    // This is only used when a direct compass heading is unavailable.
-    h=360-e.alpha;
+    // Inverted compass reading.
+    h=e.alpha;
   }
 
   if(h===null)return;
