@@ -2,1051 +2,204 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,
-           initial-scale=1,
-           viewport-fit=cover"
->
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Localizador</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-
-*{
-    box-sizing:border-box;
-}
-
-html,
-body{
-
-    margin:0;
-
-    width:100%;
-    height:100%;
-
-    background:#000;
-
-    color:#39ff88;
-
-    font-family:Arial,sans-serif;
-
-    overflow:hidden;
-}
-
-.screen{
-
-    position:fixed;
-
-    inset:0;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    background:#000;
-}
-
-.hidden{
-    display:none!important;
-}
-
-
-/* =========================
-   TELA INICIAL
-========================= */
-
-#start{
-
-    flex-direction:column;
-
-    gap:26px;
-}
-
-#title{
-
-    font-size:22px;
-
-    letter-spacing:6px;
-
-    text-shadow:
-        0 0 10px #39ff88,
-        0 0 25px #39ff8844;
-}
-
-button{
-
-    border:1px solid #39ff88;
-
-    background:transparent;
-
-    color:#39ff88;
-
-    padding:18px 28px;
-
-    font-size:15px;
-
-    letter-spacing:2px;
-
-    font-weight:bold;
-
-    box-shadow:
-        0 0 18px #39ff8833;
-
-    cursor:pointer;
-}
-
-button:active{
-
-    transform:scale(.97);
-
-    background:#39ff8814;
-}
-
-#status{
-
-    font-size:10px;
-
-    letter-spacing:3px;
-
-    opacity:.55;
-
-    text-align:center;
-}
-
-
-/* =========================
-   LOCALIZADOR
-========================= */
-
-#locator{
-
-    flex-direction:column;
-}
-
-#arrow{
-
-    width:190px;
-
-    height:190px;
-
-    filter:
-        drop-shadow(0 0 12px #39ff88)
-        drop-shadow(0 0 30px #39ff8844);
-
-    transform-origin:center;
-
-    will-change:transform;
-}
-
-#arrow svg{
-
-    width:100%;
-    height:100%;
-}
-
-.dot{
-
-    position:absolute;
-
-    width:7px;
-    height:7px;
-
-    border-radius:50%;
-
-    background:#39ff88;
-
-    box-shadow:
-        0 0 10px #39ff88,
-        0 0 25px #39ff88;
-}
-
-#info{
-
-    position:absolute;
-
-    bottom:28px;
-
-    text-align:center;
-
-    font-size:10px;
-
-    letter-spacing:2px;
-
-    opacity:.55;
-
-    line-height:1.8;
-}
-
-#distance{
-
-    font-size:14px;
-
-    letter-spacing:3px;
-
-    opacity:.8;
-}
-
-#found{
-
-    position:absolute;
-
-    top:25px;
-
-    font-size:11px;
-
-    letter-spacing:4px;
-
-    opacity:.8;
-}
-
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#39ff88;font-family:Arial,sans-serif}
+.screen{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+.hidden{display:none!important}
+h1{margin:0 0 12px;font-size:clamp(30px,8vw,58px);letter-spacing:3px;text-shadow:0 0 18px #39ff8866}
+.subtitle{max-width:500px;color:#b9ffd1;line-height:1.5;margin-bottom:32px}
+button{border:2px solid #39ff88;background:#000;color:#39ff88;border-radius:12px;padding:17px 30px;font-size:17px;font-weight:bold;letter-spacing:1px;cursor:pointer}
+button:disabled{opacity:.5}
+#status{min-height:24px;margin-top:22px;color:#b9ffd1;font-size:14px}
+#locatorScreen{justify-content:space-between;padding-top:55px;padding-bottom:40px}
+.top{width:100%;display:flex;flex-direction:column;align-items:center}
+.role{font-size:13px;letter-spacing:2px;opacity:.8;margin-bottom:8px}
+#distance{font-size:clamp(25px,7vw,42px);font-weight:bold;text-shadow:0 0 15px #39ff8859}
+#directionText{margin-top:8px;font-size:14px;color:#b9ffd1}
+.arrow-area{position:relative;width:min(78vw,360px);height:min(78vw,360px);display:flex;align-items:center;justify-content:center}
+.circle{position:absolute;width:100%;height:100%;border:1px solid #39ff8833;border-radius:50%}
+.circle:before,.circle:after{content:"";position:absolute;background:#39ff8829}
+.circle:before{width:1px;height:100%;left:50%;top:0}.circle:after{width:100%;height:1px;left:0;top:50%}
+#arrow{width:0;height:0;border-left:34px solid transparent;border-right:34px solid transparent;border-bottom:150px solid #39ff88;filter:drop-shadow(0 0 12px #39ff888c);transform-origin:50% 57%;position:relative;z-index:2}
+#targetScreen{gap:14px}
+.targetIcon{font-size:70px}.targetTitle{font-size:27px;font-weight:bold;letter-spacing:2px}
+.targetText{color:#b9ffd1;max-width:440px;line-height:1.55}
+#targetStatus{color:#b9ffd1}
+.bottom{color:#8fffb2;font-size:12px;line-height:1.5;max-width:400px}
 </style>
 </head>
-
 <body>
 
-
-<!-- =========================
-     TELA INICIAL
-========================= -->
-
-<section id="start" class="screen">
-
-    <div id="title">
-        LOCALIZADOR
-    </div>
-
-    <button id="startBtn">
-        LIGAR LOCALIZADOR
-    </button>
-
-    <div id="status">
-        AGUARDANDO ATIVAÇÃO
-    </div>
-
+<section id="startScreen" class="screen">
+<h1>LOCALIZADOR</h1>
+<div class="subtitle">Ligue o localizador. O primeiro celular ficará junto do PC e será usado como ponto de referência. O segundo celular poderá ser levado com você.</div>
+<button id="startButton">LIGAR LOCALIZADOR</button>
+<div id="status"></div>
 </section>
 
-
-<!-- =========================
-     TELA DO LOCALIZADOR
-========================= -->
-
-<section id="locator" class="screen hidden">
-
-    <div id="found"></div>
-
-    <div class="dot"></div>
-
-    <div id="arrow">
-
-        <svg viewBox="0 0 100 100">
-
-            <path
-                d="M50 5
-                   L72 70
-                   L50 59
-                   L28 70
-                   Z"
-                fill="none"
-                stroke="#39ff88"
-                stroke-width="3"
-                stroke-linejoin="round"
-            />
-
-            <circle
-                cx="50"
-                cy="50"
-                r="3"
-                fill="#39ff88"
-            />
-
-        </svg>
-
-    </div>
-
-    <div id="distance">
-        --
-    </div>
-
-    <div id="info">
-        LOCALIZADOR ATIVO<br>
-        PROCURANDO ALVO
-    </div>
-
+<section id="locatorScreen" class="screen hidden">
+<div class="top">
+<div class="role">LOCALIZANDO O PC</div>
+<div id="distance">Aguardando localização...</div>
+<div id="directionText">Aponte o celular para se orientar.</div>
+</div>
+<div class="arrow-area"><div class="circle"></div><div id="arrow"></div></div>
+<div class="bottom">A seta aponta para o celular que está junto do PC.<br>Caminhe e acompanhe a distância.</div>
 </section>
 
+<section id="targetScreen" class="screen hidden">
+<div class="targetIcon">📍</div>
+<div class="targetTitle">PONTO DO PC ATIVO</div>
+<div class="targetText">Este celular está sendo usado como referência. Deixe-o junto do PC. O outro celular poderá encontrar este ponto.</div>
+<div id="targetStatus">GPS iniciando...</div>
+</section>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL="https://vbfptmapfeoctdoruwzy.supabase.co";
+const SUPABASE_KEY="sb_publishable_tsSLFHjAjaa6PG5aENtefQ_NTsXbKLC";
+const SESSION_ID="localizador-principal";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-/* ==================================================
-   CONFIGURAÇÃO SUPABASE
+let deviceId=localStorage.getItem("localizador_device_id");
+if(!deviceId){deviceId=(crypto.randomUUID?crypto.randomUUID():"device-"+Date.now()+"-"+Math.random().toString(36).slice(2));localStorage.setItem("localizador_device_id",deviceId)}
 
-   TROQUE ESTES DOIS VALORES
-================================================== */
+let role=null,watchId=null,target=null,currentHeading=null,targetBearing=null,lastRotation=0;
 
-const SUPABASE_URL =
-    "https://vbfptmapfeoctdoruwzy.supabase.co";
+const startScreen=document.getElementById("startScreen");
+const locatorScreen=document.getElementById("locatorScreen");
+const targetScreen=document.getElementById("targetScreen");
+const startButton=document.getElementById("startButton");
+const status=document.getElementById("status");
+const distanceEl=document.getElementById("distance");
+const directionText=document.getElementById("directionText");
+const targetStatus=document.getElementById("targetStatus");
+const arrow=document.getElementById("arrow");
 
-const SUPABASE_KEY =
-    "sb_publishable_tsSLFHjAjaa6PG5aENtefQ_NTsXbKLC";
+startButton.onclick=iniciar;
 
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-
-/* ==================================================
-   ELEMENTOS
-================================================== */
-
-const start =
-    document.getElementById("start");
-
-const locator =
-    document.getElementById("locator");
-
-const startBtn =
-    document.getElementById("startBtn");
-
-const status =
-    document.getElementById("status");
-
-const arrow =
-    document.getElementById("arrow");
-
-const info =
-    document.getElementById("info");
-
-const distanceElement =
-    document.getElementById("distance");
-
-const found =
-    document.getElementById("found");
-
-
-/* ==================================================
-   IDENTIFICAÇÃO DO DISPOSITIVO
-================================================== */
-
-const userAgent =
-    navigator.userAgent.toLowerCase();
-
-const isMobile =
-    /android|iphone|ipad|ipod|mobile/i.test(userAgent);
-
-
-/*
-   PC = transmissor
-
-   CELULAR = receptor
-*/
-
-const deviceType =
-    isMobile ? "mobile" : "pc";
-
-
-/* ==================================================
-   IDENTIFICADOR INTERNO
-================================================== */
-
-const SESSION_ID =
-    "localizador-principal";
-
-
-/* ==================================================
-   VARIÁVEIS
-================================================== */
-
-let targetLatitude = null;
-
-let targetLongitude = null;
-
-let currentLatitude = null;
-
-let currentLongitude = null;
-
-let deviceHeading = 0;
-
-let targetBearing = null;
-
-
-/* ==================================================
-   NORMALIZAÇÃO
-================================================== */
-
-function norm(angle){
-
-    return (angle + 360) % 360;
+async function iniciar(){
+  startButton.disabled=true; status.textContent="Iniciando...";
+  try{
+    const {data,error}=await db.from("localizador").select("*").eq("id",SESSION_ID).maybeSingle();
+    if(error)throw error;
+    if(!data) await iniciarPonto();
+    else await iniciarLocalizador();
+  }catch(e){
+    console.error(e);status.textContent="Não foi possível conectar ao servidor.";startButton.disabled=false;
+  }
 }
 
-
-/* ==================================================
-   DIFERENÇA ENTRE ÂNGULOS
-================================================== */
-
-function angleDiff(a,b){
-
-    return ((a-b+540)%360)-180;
+async function iniciarPonto(){
+  role="target";startScreen.classList.add("hidden");targetScreen.classList.remove("hidden");
+  targetStatus.textContent="Obtendo localização...";
+  if(!navigator.geolocation){targetStatus.textContent="GPS indisponível neste celular.";return}
+  watchId=navigator.geolocation.watchPosition(enviarPosicao,erroGPS,{enableHighAccuracy:true,maximumAge:2000,timeout:15000});
 }
 
-
-/* ==================================================
-   DISTÂNCIA ENTRE DOIS PONTOS
-================================================== */
-
-function calculateDistance(
-    lat1,
-    lon1,
-    lat2,
-    lon2
-){
-
-    const R = 6371000;
-
-    const p1 =
-        lat1 * Math.PI / 180;
-
-    const p2 =
-        lat2 * Math.PI / 180;
-
-    const dp =
-        (lat2-lat1) *
-        Math.PI / 180;
-
-    const dl =
-        (lon2-lon1) *
-        Math.PI / 180;
-
-    const a =
-        Math.sin(dp/2) *
-        Math.sin(dp/2) +
-
-        Math.cos(p1) *
-        Math.cos(p2) *
-
-        Math.sin(dl/2) *
-        Math.sin(dl/2);
-
-    const c =
-        2 *
-        Math.atan2(
-            Math.sqrt(a),
-            Math.sqrt(1-a)
-        );
-
-    return R*c;
+async function enviarPosicao(p){
+  const {latitude,longitude,accuracy}=p.coords;
+  targetStatus.textContent="Ponto ativo • precisão aproximada: "+Math.round(accuracy)+" m";
+  const {error}=await db.from("localizador").upsert({
+    id:SESSION_ID,latitude,longitude,atualizado_em:new Date().toISOString(),ativo:true,dispositivo:deviceId
+  },{onConflict:"id"});
+  if(error){console.error(error);targetStatus.textContent="GPS funcionando, mas não foi possível enviar a posição."}
 }
 
-
-/* ==================================================
-   DIREÇÃO DO CELULAR PARA O PC
-================================================== */
-
-function calculateBearing(
-    lat1,
-    lon1,
-    lat2,
-    lon2
-){
-
-    const p1 =
-        lat1 * Math.PI / 180;
-
-    const p2 =
-        lat2 * Math.PI / 180;
-
-    const dl =
-        (lon2-lon1) *
-        Math.PI / 180;
-
-    const y =
-        Math.sin(dl) *
-        Math.cos(p2);
-
-    const x =
-        Math.cos(p1) *
-        Math.sin(p2)
-
-        -
-
-        Math.sin(p1) *
-        Math.cos(p2) *
-        Math.cos(dl);
-
-    const angle =
-        Math.atan2(y,x) *
-        180 / Math.PI;
-
-    return norm(angle);
+async function iniciarLocalizador(){
+  role="locator";startScreen.classList.add("hidden");locatorScreen.classList.remove("hidden");
+  distanceEl.textContent="Obtendo localização...";directionText.textContent="Ativando GPS e bússola...";
+  navigator.geolocation.watchPosition(p=>{
+    if(target)calcular(p.coords.latitude,p.coords.longitude);
+  },erroGPS,{enableHighAccuracy:true,maximumAge:1000,timeout:15000});
+  await pedirBussola();
+  ouvirAlvo();
 }
 
-
-/* ==================================================
-   TREMOR DA SETA
-================================================== */
-
-function getTremor(t){
-
-    return (
-
-        Math.sin(t * 7.3) * 1.8 +
-
-        Math.sin(t * 11.7) * 0.9 +
-
-        Math.sin(t * 17.2) * 0.5
-    );
+function ouvirAlvo(){
+  db.channel("localizador-realtime")
+    .on("postgres_changes",{event:"*",schema:"public",table:"localizador",filter:"id=eq."+SESSION_ID},
+      payload=>{if(payload.new&&payload.new.ativo)atualizarAlvo(payload.new)})
+    .subscribe();
+  carregarAlvo();
 }
 
+async function carregarAlvo(){
+  const {data,error}=await db.from("localizador").select("*").eq("id",SESSION_ID).maybeSingle();
+  if(!error&&data&&data.ativo)atualizarAlvo(data);
+}
 
-/* ==================================================
-   ANIMAÇÃO DA SETA
-================================================== */
+function atualizarAlvo(d){
+  target={latitude:Number(d.latitude),longitude:Number(d.longitude)};
+  directionText.textContent="Alvo recebido. Procurando direção...";
+}
 
-function animateArrow(){
-
-    const t =
-        Date.now()/1000;
-
-    const tremor =
-        getTremor(t);
-
-    if(targetBearing === null){
-
-        const search =
-
-            Math.sin(t*.8)*5 +
-
-            Math.sin(t*1.37)*2;
-
-        arrow.style.transform =
-            `rotate(${search+tremor}deg)`;
-
-    }else{
-
-        const direction =
-            angleDiff(
-                targetBearing,
-                deviceHeading
-            );
-
-        arrow.style.transform =
-            `rotate(${direction+tremor}deg)`;
+async function pedirBussola(){
+  try{
+    if(typeof DeviceOrientationEvent!=="undefined"&&typeof DeviceOrientationEvent.requestPermission==="function"){
+      const p=await DeviceOrientationEvent.requestPermission();
+      if(p!=="granted"){directionText.textContent="Permita a bússola para usar a seta.";return}
     }
-
-    requestAnimationFrame(
-        animateArrow
-    );
+    addEventListener("deviceorientationabsolute",orientacao,true);
+    addEventListener("deviceorientation",orientacao,true);
+  }catch(e){addEventListener("deviceorientation",orientacao,true)}
 }
 
-
-/* ==================================================
-   BÚSSOLA
-================================================== */
-
-function orientationHandler(event){
-
-    let heading = null;
-
-
-    if(
-        typeof event.webkitCompassHeading
-        === "number"
-    ){
-
-        heading =
-            event.webkitCompassHeading;
-    }
-
-    else if(
-        typeof event.alpha
-        === "number"
-    ){
-
-        heading =
-            360-event.alpha;
-    }
-
-
-    if(heading === null)
-        return;
-
-
-    deviceHeading =
-        norm(heading);
+function orientacao(e){
+  let h=null;
+  if(typeof e.webkitCompassHeading==="number"&&e.webkitCompassHeading>=0)h=e.webkitCompassHeading;
+  else if(typeof e.alpha==="number")h=360-e.alpha;
+  if(h===null)return;
+  currentHeading=normalizar(h);
+  atualizarSeta();
+  if(targetBearing!==null)directionText.textContent="Direção relativa: "+Math.round(normalizar(targetBearing-currentHeading))+"°";
 }
 
-
-/* ==================================================
-   ATIVAR BÚSSOLA
-================================================== */
-
-async function activateCompass(){
-
-    try{
-
-        if(
-
-            typeof DeviceOrientationEvent
-            !== "undefined"
-
-            &&
-
-            typeof DeviceOrientationEvent
-            .requestPermission
-            === "function"
-
-        ){
-
-            const permission =
-                await DeviceOrientationEvent
-                .requestPermission();
-
-            if(
-                permission !== "granted"
-            ){
-
-                throw new Error(
-                    "Compass permission denied"
-                );
-            }
-        }
-
-
-        window.addEventListener(
-            "deviceorientationabsolute",
-            orientationHandler,
-            true
-        );
-
-
-        window.addEventListener(
-            "deviceorientation",
-            orientationHandler,
-            true
-        );
-
-    }
-
-    catch(error){
-
-        console.log(
-            "Bússola:",
-            error
-        );
-    }
+function calcular(lat,lon){
+  if(!target){distanceEl.textContent="Aguardando o outro celular...";return}
+  const d=distancia(lat,lon,target.latitude,target.longitude);
+  targetBearing=bearing(lat,lon,target.latitude,target.longitude);
+  distanceEl.textContent=d<1000?Math.round(d)+" m":(d/1000).toFixed(2)+" km";
+  atualizarSeta();
 }
 
-
-/* ==================================================
-   LOCALIZAÇÃO DO PC
-================================================== */
-
-function startPC(){
-
-    status.textContent =
-        "ATIVANDO LOCALIZAÇÃO...";
-
-
-    if(!navigator.geolocation){
-
-        status.textContent =
-            "GEOLOCALIZAÇÃO NÃO DISPONÍVEL";
-
-        return;
-    }
-
-
-    navigator.geolocation.watchPosition(
-
-        async position => {
-
-            currentLatitude =
-                position.coords.latitude;
-
-            currentLongitude =
-                position.coords.longitude;
-
-
-            const { error } =
-                await supabaseClient
-                .from("localizador")
-                .upsert({
-
-                    id:SESSION_ID,
-
-                    latitude:
-                        currentLatitude,
-
-                    longitude:
-                        currentLongitude,
-
-                    atualizado_em:
-                        new Date()
-                        .toISOString(),
-
-                    ativo:true
-
-                });
-
-
-            if(error){
-
-                console.error(error);
-
-                status.textContent =
-                    "ERRO AO TRANSMITIR";
-
-            }else{
-
-                status.textContent =
-                    "LOCALIZADOR ATIVO";
-            }
-
-        },
-
-        error => {
-
-            console.error(error);
-
-            status.textContent =
-                "NÃO FOI POSSÍVEL OBTER A LOCALIZAÇÃO";
-        },
-
-        {
-
-            enableHighAccuracy:true,
-
-            maximumAge:1000,
-
-            timeout:10000
-        }
-    );
+function atualizarSeta(){
+  if(targetBearing===null||currentHeading===null)return;
+  const base=normalizar(targetBearing-currentHeading);
+  const t=performance.now()/1000;
+  const tremor=Math.sin(t*10)*2.2+Math.sin(t*17)*1.1+(Math.random()-.5)*1.2;
+  let r=lastRotation+angular(base+tremor,lastRotation)*.35;
+  lastRotation=r;arrow.style.transform="rotate("+r+"deg)";
+  requestAnimationFrame(atualizarSeta);
 }
 
-
-/* ==================================================
-   RECEBER LOCALIZAÇÃO DO PC
-================================================== */
-
-async function startMobile(){
-
-    status.textContent =
-        "PROCURANDO PC...";
-
-
-    await receiveTarget();
-
-
-    supabaseClient
-
-        .channel("localizador-realtime")
-
-        .on(
-
-            "postgres_changes",
-
-            {
-
-                event:"*",
-
-                schema:"public",
-
-                table:"localizador",
-
-                filter:
-                    `id=eq.${SESSION_ID}`
-
-            },
-
-            payload => {
-
-                updateTarget(
-                    payload.new
-                );
-
-            }
-
-        )
-
-        .subscribe();
-
-
-    /*
-       Também verifica a posição
-       atual imediatamente.
-    */
-
-    setInterval(
-        receiveTarget,
-        2000
-    );
+function distancia(a,b,c,d){
+  const R=6371000,p1=a*Math.PI/180,p2=c*Math.PI/180,dp=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180;
+  const x=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
-
-
-/* ==================================================
-   BUSCAR PC
-================================================== */
-
-async function receiveTarget(){
-
-    const { data, error } =
-
-        await supabaseClient
-
-        .from("localizador")
-
-        .select("*")
-
-        .eq("id",SESSION_ID)
-
-        .eq("ativo",true)
-
-        .maybeSingle();
-
-
-    if(error){
-
-        console.error(error);
-
-        return;
-    }
-
-
-    if(data){
-
-        updateTarget(data);
-
-    }else{
-
-        status.textContent =
-            "PROCURANDO PC...";
-    }
+function bearing(a,b,c,d){
+  const p1=a*Math.PI/180,p2=c*Math.PI/180,dl=(d-b)*Math.PI/180;
+  const y=Math.sin(dl)*Math.cos(p2),x=Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
+  return normalizar(Math.atan2(y,x)*180/Math.PI);
 }
+function normalizar(a){return(a%360+360)%360}
+function angular(a,b){return((a-b+540)%360)-180}
 
-
-/* ==================================================
-   ATUALIZAR ALVO
-================================================== */
-
-function updateTarget(data){
-
-    if(
-        !data ||
-        data.latitude === null ||
-        data.longitude === null
-    )
-        return;
-
-
-    targetLatitude =
-        Number(data.latitude);
-
-    targetLongitude =
-        Number(data.longitude);
-
-
-    status.textContent =
-        "PC ENCONTRADO";
-
-    found.textContent =
-        "ALVO ENCONTRADO";
-
-
-    if(
-        currentLatitude !== null &&
-        currentLongitude !== null
-    ){
-
-        updateDirection();
-    }
+function erroGPS(e){
+  console.error(e);
+  if(e.code===1){
+    if(role==="target")targetStatus.textContent="Permita o acesso à localização.";
+    else{distanceEl.textContent="Permita o GPS";directionText.textContent="Permita a localização nas configurações do navegador."}
+  }else if(e.code===2){
+    if(role==="target")targetStatus.textContent="Não foi possível obter o GPS.";else distanceEl.textContent="GPS indisponível";
+  }else if(e.code===3){
+    if(role==="target")targetStatus.textContent="GPS demorando...";else distanceEl.textContent="GPS demorando...";
+  }
 }
-
-
-/* ==================================================
-   LOCALIZAÇÃO DO CELULAR
-================================================== */
-
-function startMobileLocation(){
-
-    if(!navigator.geolocation)
-        return;
-
-
-    navigator.geolocation.watchPosition(
-
-        position => {
-
-            currentLatitude =
-                position.coords.latitude;
-
-            currentLongitude =
-                position.coords.longitude;
-
-
-            updateDirection();
-        },
-
-        error => {
-
-            console.log(
-                "GPS:",
-                error
-            );
-
-        },
-
-        {
-
-            enableHighAccuracy:true,
-
-            maximumAge:1000,
-
-            timeout:10000
-        }
-    );
-}
-
-
-/* ==================================================
-   CALCULAR DIREÇÃO
-================================================== */
-
-function updateDirection(){
-
-    if(
-        currentLatitude === null ||
-        currentLongitude === null ||
-
-        targetLatitude === null ||
-        targetLongitude === null
-    )
-        return;
-
-
-    targetBearing =
-        calculateBearing(
-
-            currentLatitude,
-
-            currentLongitude,
-
-            targetLatitude,
-
-            targetLongitude
-        );
-
-
-    const distance =
-        calculateDistance(
-
-            currentLatitude,
-
-            currentLongitude,
-
-            targetLatitude,
-
-            targetLongitude
-        );
-
-
-    if(distance < 5){
-
-        distanceElement.textContent =
-            "ALVO ENCONTRADO";
-
-        info.innerHTML =
-            "VOCÊ CHEGOU AO PC";
-
-    }
-
-    else if(distance < 1000){
-
-        distanceElement.textContent =
-            Math.round(distance) + " m";
-
-        info.innerHTML =
-            "DIREÇÃO DO PC";
-
-    }
-
-    else{
-
-        distanceElement.textContent =
-            (distance/1000)
-            .toFixed(2)
-            + " km";
-
-        info.innerHTML =
-            "DIREÇÃO DO PC";
-    }
-}
-
-
-/* ==================================================
-   BOTÃO
-================================================== */
-
-startBtn.addEventListener(
-    "click",
-    async () => {
-
-        start.classList.add(
-            "hidden"
-        );
-
-        locator.classList.remove(
-            "hidden"
-        );
-
-
-        /*
-           CELULAR
-        */
-
-        if(deviceType === "mobile"){
-
-            await activateCompass();
-
-            startMobile();
-
-            startMobileLocation();
-        }
-
-
-        /*
-           PC
-        */
-
-        else{
-
-            startPC();
-
-            info.innerHTML =
-                "PC TRANSMITINDO LOCALIZAÇÃO";
-
-            distanceElement.textContent =
-                "TRANSMITINDO";
-        }
-
-    }
-);
-
-
-/* ==================================================
-   COMEÇAR ANIMAÇÃO
-================================================== */
-
-animateArrow();
-
+requestAnimationFrame(atualizarSeta);
 </script>
-
 </body>
 </html>
