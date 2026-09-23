@@ -71,7 +71,7 @@ if(!deviceId){
 let role=null,targetPos=null;
 let targetBearing=null;
 let smoothedTargetBearing=null;
-let heading=null;
+let heading=null;\nlet headingOffset=0;\nlet calibrationSamples=[];
 let smoothedHeading=null;
 let lastRawHeading=null;
 let lastRotation=0;
@@ -337,32 +337,34 @@ async function compass(){
 }
 
 function onOrientation(e){
-  let h=null;
+  let raw=null;
 
-  // iPhone/iPad: este valor já é a bússola do aparelho.
   if(typeof e.webkitCompassHeading==="number"&&Number.isFinite(e.webkitCompassHeading)){
-    h=e.webkitCompassHeading;
+    raw=e.webkitCompassHeading;
   }else if(typeof e.alpha==="number"&&Number.isFinite(e.alpha)){
-    // Android/Chrome: converte alpha para rumo e corrige a rotação da tela.
-    h=360-e.alpha;
+    raw=360-e.alpha;
 
-    const screenAngle =
-      (screen.orientation && typeof screen.orientation.angle==="number")
-        ? screen.orientation.angle
-        : (typeof window.orientation==="number" ? window.orientation : 0);
+    const a=(screen.orientation && typeof screen.orientation.angle==="number")
+      ? screen.orientation.angle
+      : (typeof window.orientation==="number" ? window.orientation : 0);
 
-    h+=screenAngle;
+    raw+=a;
   }
 
-  if(h===null)return;
+  if(raw===null)return;
 
-  h=((h%360)+360)%360;
+  raw=((raw%360)+360)%360;
 
-  // Suavização circular para evitar saltos causados pelo sensor.
+  // Aplica a calibração feita pelo usuário.
+  let h=(raw+headingOffset+360)%360;
+
   if(lastHeading!==null){
     let d=((h-lastHeading+540)%360)-180;
-    if(Math.abs(d)>100)return;
-    h=lastHeading+d*0.12;
+
+    // Não aceita um salto impossível do sensor.
+    if(Math.abs(d)>120)return;
+
+    h=(lastHeading+d*0.10+360)%360;
   }
 
   lastHeading=h;
@@ -405,6 +407,23 @@ function calculate(lat,lon){
     :(d/1000).toFixed(2)+" km";
 
   updateArrow();
+}
+
+const calibrateBtn=document.getElementById("calibrateBtn");
+if(calibrateBtn){
+  calibrateBtn.addEventListener("click",()=>{
+    if(heading===null){
+      alert("Aguarde a bússola encontrar a direção.");
+      return;
+    }
+    // Zera a diferença atual. Isso permite testar o sensor sem
+    // depender de uma inversão fixa.
+    headingOffset=(360-heading)%360;
+    lastHeading=0;
+    heading=0;
+    calibrateBtn.textContent="DIREÇÃO CALIBRADA";
+    setTimeout(()=>calibrateBtn.textContent="CALIBRAR DIREÇÃO",1500);
+  });
 }
 
 function updateArrow(){
